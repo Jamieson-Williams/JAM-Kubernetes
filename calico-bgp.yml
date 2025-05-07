@@ -1,0 +1,21 @@
+apiVersion: projectcalico.org/v3
+kind: BGPConfiguration
+metadata: 
+  name: default
+spec:
+  nodeToNodeMeshEnabled: true
+  asNumber: 64550
+  serviceClusterIPs: 
+    - cidr: 10.96.0.0/12
+  serviceExternalIPs:
+    - cidr: 10.254.0.0/24
+  listenPort: 179
+
+---
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: vyos01-peer
+spec:
+  peerIP: 10.0.10.1
+  asNumber: 64512

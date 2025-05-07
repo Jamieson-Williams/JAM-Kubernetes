@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jellyfin
+  labels:
+    app: jellyfin
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: jellyfin
+  template:
+    metadata:
+      labels:
+        app: jellyfin
+    spec:
+      volumes:
+      - name: nfs-jellyfin-config
+        persistentVolumeClaim: 
+          claimName: jellyfin-pvc-config
+      - name: nfs-jellyfin-data
+        persistentVolumeClaim:
+          claimName: jellyfin-pvc-data
+      containers:
+      - env:
+        - name: JELLYFIN_PublishedServerUrl
+          value: 10.254.0.1
+        - name: PGID
+          value: "1001"
+        - name: PUID
+          value: "1000"
+        - name: TZ
+          value: Australia/Melbourne
+        securityContext:
+          privileged: true
+        image: lscr.io/linuxserver/jellyfin:latest
+        imagePullPolicy: IfNotPresent
+        name: jellyfin
+        ports:
+        - containerPort: 8096
+          name: http-tcp
+          protocol: TCP
+        - containerPort: 8920
+          name: https-tcp
+          protocol: TCP
+        - containerPort: 1900
+          name: dlna-udp
+          protocol: UDP
+        - containerPort: 7359
+          name: discovery-udp
+          protocol: UDP
+        resources: {}
+        stdin: true
+        tty: true
+        volumeMounts:
+        - mountPath: /config
+          name: nfs-jellyfin-config
+        - mountPath: /media
+          name: nfs-jellyfin-data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+---
+# Service 
+apiVersion: v1
+kind: Service
+metadata:
+  name: plex
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: plex
+  ports:
+    - protocol: TCP
+      port: 32400
+      targetPort: 32400
+    - protocol: UDP
+      port: 32400
+      targetPort: 32400
+  externalIPs:
+    - 10.254.0.1
+---
+# Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-pv-nfs-config
+spec: 
+  storageClassName: ""
+  capacity:
+    storage: 1Gi
+  accessModes: 
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /srv/nfs/jellyfin/config/
+    server: 10.0.10.84
+    readOnly: false
+---
+# Persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: jellyfin-pv-nfs-data
+spec: 
+  storageClassName: ""
+  capacity:
+    storage: 100Gi
+  accessModes: 
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /srv/nfs/jellyfin/media/
+    server: 10.0.10.84
+    readOnly: false
+---
+# Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-pvc-config
+spec:
+  storageClassName: ""
+  volumeName: jellyfin-pv-nfs-config
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+---
+# Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jellyfin-pvc-data
+spec:
+  storageClassName: ""
+  volumeName: jellyfin-pv-nfs-data
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 100Gi
+  accessModes:
+    - ReadWriteMany
