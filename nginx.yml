@@ -26,6 +26,7 @@ metadata:
   name: nginx-service
 spec:
   type: LoadBalancer  # You can also use 'NodePort' or 'ClusterIP' based on your requirements
+  loadBalancerIP: 10.200.0.5
   selector:
     app: nginx
   ports:
