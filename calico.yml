@@ -17,7 +17,18 @@ spec:
       encapsulation: None
       natOutgoing: Enabled
       nodeSelector: all()
-
+#---
+#apiVersion: projectcalico.org/v3
+#kind: IPPool
+#metadata:
+#  name: external-lb-pool
+#spec:
+#  cidr: 10.254.0.0/24
+#  blockSize: 26
+#  natOutgoing: true
+#  disabled: false
+#  allowedUses:
+#    - LoadBalancer
 ---
 apiVersion: operator.tigera.io/v1
 kind: APIServer
