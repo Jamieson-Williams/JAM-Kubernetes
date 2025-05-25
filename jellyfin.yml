@@ -30,7 +30,7 @@ spec:
       containers:
       - env:
         - name: JELLYFIN_PublishedServerUrl
-          value: 10.254.0.1
+          value: 10.200.0.10
         - name: PGID
           value: "1001"
         - name: PUID
@@ -70,20 +70,34 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: plex
+  name: jellyfin-service
 spec:
-  type: LoadBalancer
   selector:
-    app.kubernetes.io/name: plex
+    app: jellyfin
   ports:
-    - protocol: TCP
-      port: 32400
-      targetPort: 32400
-    - protocol: UDP
-      port: 32400
-      targetPort: 32400
-  externalIPs:
-    - 10.254.0.1
+    - name: http-tcp
+      port: 8096
+      targetPort: 8096
+      nodePort: 30096
+      protocol: TCP
+    - name: https-tcp
+      port: 8920
+      targetPort: 8920
+      nodePort: 30920
+      protocol: TCP
+    - name: dlna-udp
+      port: 1900
+      targetPort: 1900
+      nodePort: 32300
+      protocol: UDP
+    - name: discovery-udp
+      port: 7359
+      targetPort: 7359
+      nodePort: 31359
+      protocol: UDP
+  type: LoadBalancer
+  loadBalancerIP: 10.200.0.10
+  sessionAffinity: ClientIP
 ---
 # Persistent Volume
 apiVersion: v1
