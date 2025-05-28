@@ -26,11 +26,33 @@ metadata:
   name: nginx-service
 spec:
   type: LoadBalancer  # You can also use 'NodePort' or 'ClusterIP' based on your requirements
-  loadBalancerIP: 10.200.0.5
+#  loadBalancerIP: 10.200.0.5
   selector:
     app: nginx
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-01
+  labels:
+    name: nginx-01
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nginx.jam.com.au
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: nginx-service
+            port: 
+              number: 80
+
 
