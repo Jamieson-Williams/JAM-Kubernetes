@@ -6,7 +6,7 @@ metadata:
   namespace: metallb-system
 spec:
   addresses:
-    - 10.200.0.10/24
+    - 10.200.0.5-10.200.0.200
 
 ---
 # BGP local Advertisement policy
