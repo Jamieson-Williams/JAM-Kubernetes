@@ -1,0 +1,47 @@
+# IP Pool for LoadBalancer services
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.200.0.5-10.200.0.200
+
+#---
+# BGP local Advertisement policy
+#apiVersion: metallb.io/v1beta1
+#kind: BGPAdvertisement
+#metadata:
+#  name: local
+#  namespace: metallb-system
+#spec:
+#  ipAddressPools:
+#  - jellyfin-pool
+#  aggregationLength: 32
+#  localPref: 100
+#  communities: 
+#  - 65535:65282
+
+#---
+# BGP external Advertisement policy
+#apiVersion: metallb.io/v1beta1
+#kind: BGPAdvertisement
+#metadata:
+#  name: external
+#  namespace: metallb-system
+#spec:
+#  ipAddressPools:
+#  - default
+
+#---
+# Peer with upstream router
+#apiVersion: metallb.io/v1beta2
+#kind: BGPPeer
+#metadata:
+#  name: vyos01-lb-peer
+#  namespace: metallb-system
+#spec:
+#  myASN: 64514
+#  peerASN: 64512
+#  peerAddress: 10.0.10.1

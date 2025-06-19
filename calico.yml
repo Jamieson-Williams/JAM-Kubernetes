@@ -15,8 +15,9 @@ spec:
       blockSize: 26
       cidr: 10.244.0.0/16
       encapsulation: None
-      natOutgoing: Enabled
+      natOutgoing: Disabled
       nodeSelector: all()
+
 #---
 #apiVersion: projectcalico.org/v3
 #kind: IPPool

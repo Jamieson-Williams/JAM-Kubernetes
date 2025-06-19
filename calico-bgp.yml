@@ -8,7 +8,7 @@ spec:
   serviceClusterIPs: 
     - cidr: 10.96.0.0/12
   serviceLoadBalancerIPs:
-    - cidr: 10.254.0.0/24
+    - cidr: 10.200.0.0/24
   listenPort: 179
 
 ---
